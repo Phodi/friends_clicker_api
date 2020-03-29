@@ -1,6 +1,7 @@
 {
-  "name": "test_mongo",
+  "name": "clicker_api",
   "version": "0.1.0",
+  "author": "Phodi Phoocharoen",
   "private": true,
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -14,5 +15,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }
