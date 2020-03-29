@@ -14,7 +14,7 @@ discardKeys = require("../utils/discardKeys")
 
 /******* User Endpoints  *******/
 
-router.get("/api/users", auth, async (req, resp) => {
+router.get("/users", auth, async (req, resp) => {
   if (req.user.admin) {
     try {
       const users = await User.find()
@@ -27,7 +27,7 @@ router.get("/api/users", auth, async (req, resp) => {
   }
 })
 
-router.post("/api/users", async (req, resp) => {
+router.post("/users", async (req, resp) => {
   try {
     //new stats
     const stats = new Stats({})
@@ -48,7 +48,7 @@ router.post("/api/users", async (req, resp) => {
   }
 })
 
-router.post("/api/users/login", async (req, resp) => {
+router.post("/users/login", async (req, resp) => {
   try {
     const { email, password } = req.body
     const user = await User.findByCredentials(email, password)
@@ -65,7 +65,7 @@ router.post("/api/users/login", async (req, resp) => {
   }
 })
 
-router.get("/api/users/me", auth, async (req, resp) => {
+router.get("/users/me", auth, async (req, resp) => {
   const stats = { ...(await Stats.findById(req.user.stats)) }
   const userInfo = {
     name: req.user.name,
@@ -76,7 +76,7 @@ router.get("/api/users/me", auth, async (req, resp) => {
   resp.json(userInfo)
 })
 
-router.get("/api/users/stats", auth, async (req, resp) => {
+router.get("/users/stats", auth, async (req, resp) => {
   try {
     const stats = await Stats.findById(req.user.stats)
     resp.json(discardKeys(stats._doc, ["_id", "__v"]))
@@ -85,9 +85,9 @@ router.get("/api/users/stats", auth, async (req, resp) => {
   }
 })
 
-router.post("/api/users/logout", auth, (req, resp) => {})
+router.post("/users/logout", auth, (req, resp) => {})
 
-router.get("/api/users/logoutall", auth, (req, resp) => {
+router.get("/users/logoutall", auth, (req, resp) => {
   if (req.user.admin) {
     resp.send("Welcome administrator")
   } else {

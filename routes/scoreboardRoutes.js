@@ -10,7 +10,7 @@ User = require("../models/userModel")
 Stats = require("../models/statsModel")
 
 /******* Scoreboard Endpoints  *******/
-router.get("/api/scoreboard", async (req, resp) => {
+router.get("/scoreboard", async (req, resp) => {
   let users = await User.find()
   const filter = async () => {
     return Promise.all(

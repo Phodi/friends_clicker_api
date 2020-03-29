@@ -10,8 +10,8 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 //routers
-app.use(require("./routes/usersRoutes"))
-app.use(require("./routes/scoreboardRoutes"))
+app.use("/api", require("./routes/usersRoutes"))
+app.use("/api", require("./routes/scoreboardRoutes"))
 
 const PORT = process.env.PORT
 const HOSTNAME = process.env.HOSTNAME

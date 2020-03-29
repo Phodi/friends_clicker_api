@@ -13,8 +13,8 @@
     "validator": "^13.0.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
+    "start": "node server.js",
+    "dev": "nodemon server.js"
   },
   "devDependencies": {
     "nodemon": "^2.0.2"
