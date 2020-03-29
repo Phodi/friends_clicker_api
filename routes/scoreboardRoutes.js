@@ -24,11 +24,8 @@ router.get("/scoreboard", async (req, resp) => {
   }
 
   filter().then(result => {
-    console.log(result)
     resp.status(200).json(result)
   })
-
-  // resp.status(200).json(users);
 })
 
 module.exports = router
