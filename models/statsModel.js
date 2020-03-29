@@ -1,9 +1,9 @@
-const mongoose = require('mongoose')
+const connection = require("../database_connection/mongooseConnection")
 
-const statsSchema = new mongoose.Schema({
-    currentScore: {type: Number, required:true, default: 0},
-    clickMul: {type: Number, required:true, default: 1},
-    autoMul: {type: Number, required:true, default: 1}
+const statsSchema = new connection.Schema({
+  currentScore: { type: Number, required: true, default: 0 },
+  clickMul: { type: Number, required: true, default: 1 },
+  autoMul: { type: Number, required: true, default: 1 }
 })
 
-module.exports = mongoose.model("Stats",statsSchema)
+module.exports = connection.model("Stats", statsSchema)

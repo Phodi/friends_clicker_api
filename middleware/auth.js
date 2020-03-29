@@ -5,8 +5,6 @@ const User = require('../models/userModel')
 const auth = async (req,res,next) => {
     try{
         // 'Bearer <token bla bla bla> => '<token bla bla bla>'
-        console.log("Authorizing")
-        console.log(req.header('Authorization'))
         const token = req.header('Authorization').replace('Bearer ', '')
         const payload = jwt.verify(token, process.env.TOKEN_KEY)
         
@@ -19,8 +17,11 @@ const auth = async (req,res,next) => {
         req.user = user
         req.token = token
 
+        console.log("#AUTH "+(user.admin?"Admin":"User")+"[ " + user.name + " : " + user.email+" ] authenticated")
+
         next()
     }catch(error){
+        console.log("#AUTH authentication failed")
         res.status(401).json({error: 'Not authorize to access this resource.'})
     }
 
