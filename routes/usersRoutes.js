@@ -7,47 +7,83 @@ Stats = require("../models/statsModel")
 
 //import authentication middleware
 const auth = require("../middleware/auth")
+const admin = require("../middleware/auth_admin")
 
 //Utilities
 keepKeys = require("../utils/keepKeys")
 discardKeys = require("../utils/discardKeys")
 
+// db = require("../database_connection/mongooseConnection").connection
+// db.once("open", async () => {
+//   const stats = new Stats()
+//   await stats.save()
+// })
+
 /******* User Endpoints  *******/
 
-router.get("/users", auth, async (req, resp) => {
-  if (req.user.admin) {
-    try {
-      const users = await User.find()
-      resp.status(200).json(users)
-    } catch (e) {
-      resp.status(404).json({ error: e.message })
-    }
-  } else {
-    resp.json({ error: "Insufficient permission" })
+//@desc get all users
+//@auth admin
+router.get("/users", auth, admin, async (req, resp) => {
+  try {
+    const users = await User.find()
+    resp.status(200).json({ data: users })
+  } catch (e) {
+    resp.status(404).json({ error: e.message })
   }
 })
 
+//@desc get user by id
+//@auth admin
+router.get("/users/:id", auth, admin, async (req, resp) => {
+  try {
+    const user = await User.findById(req.params.id)
+    if (!user) {
+      return resp.status(404).json({ error: "user not found" })
+    }
+    resp.status(200).json({ data: user })
+  } catch (e) {
+    resp.status(404).json({ error: e.message })
+  }
+})
+
+//@desc delete user by id
+//@auth admin
+router.delete("/users/:id", auth, admin, async (req, resp) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id)
+    if (!user) {
+      return resp.status(404).json({ error: "user not found" })
+    }
+    const stats = await Stats.findByIdAndDelete(user.stats)
+    resp.status(200).json({ msg: `user ${req.params.id} deleted`, data: user })
+  } catch (e) {
+    resp.status(404).json({ error: e.message })
+  }
+})
+
+//@desc register new user
+//@auth public
 router.post("/users", async (req, resp) => {
   try {
-    //new stats
-    const stats = new Stats({})
-    await stats.save()
-
-    //new user with stats
-    const user = new User(
-      Object.assign({}, req.body, { admin: false }, { stats: stats })
-    )
+    console.log("Registering new user")
+    //new user
+    const user = new User(Object.assign({}, req.body, { admin: false }))
 
     //trigger ".pre" middleware
     await user.save()
     const token = await user.generateAuthToken()
 
-    resp.status(201).json({ msg: "User registration successful", user, token })
+    resp
+      .status(201)
+      .json({ msg: "user registration successful", data: { user } })
+      .end()
   } catch (error) {
     resp.status(400).json({ error: error.message })
   }
 })
 
+//@desc login and generate bearer token
+//@auth user
 router.post("/users/login", async (req, resp) => {
   try {
     const { email, password } = req.body
@@ -56,15 +92,17 @@ router.post("/users/login", async (req, resp) => {
     if (!user) {
       return resp
         .status(401)
-        .json({ error: "Log in failed, please check your credentials" })
+        .json({ error: "log in failed, please check your credentials" })
     }
     const token = await user.generateAuthToken()
-    resp.status(200).json({ token })
+    resp.status(200).json({ msg: "login successful", data: { token } })
   } catch (error) {
     resp.status(400).json({ error: error.message })
   }
 })
 
+//@desc get info about logged in user
+//auth user
 router.get("/users/me", auth, async (req, resp) => {
   const stats = { ...(await Stats.findById(req.user.stats)) }
   const userInfo = {
@@ -76,6 +114,8 @@ router.get("/users/me", auth, async (req, resp) => {
   resp.json(userInfo)
 })
 
+//@desc get logged in user's stats
+//auth user
 router.get("/users/stats", auth, async (req, resp) => {
   try {
     const stats = await Stats.findById(req.user.stats)
@@ -85,13 +125,15 @@ router.get("/users/stats", auth, async (req, resp) => {
   }
 })
 
+//@desc logout and invalidate bearer token
+//@auth user
 router.post("/users/logout", auth, (req, resp) => {})
 
 router.get("/users/logoutall", auth, (req, resp) => {
   if (req.user.admin) {
     resp.send("Welcome administrator")
   } else {
-    resp.json({ error: "Insufficient permission" })
+    resp.json({ error: "insufficient permission" })
   }
 })
 

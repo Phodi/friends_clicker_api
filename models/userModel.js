@@ -3,6 +3,9 @@ const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const validator = require("validator")
 
+//Models
+Stats = require("../models/statsModel")
+
 const userSchema = new connection.Schema({
   name: { type: String, required: true, trim: true },
   email: {
@@ -23,12 +26,12 @@ const userSchema = new connection.Schema({
       token: { type: String, required: true }
     }
   ],
-  stats: { type: connection.Schema.Types.ObjectId, required: false },
+  stats: { type: connection.Schema.Types.ObjectId },
   created: { type: Date, required: true, default: Date.now },
   updated: { type: Date, required: true, default: Date.now }
 })
 
-//schema-level middleware
+// schema-level middleware
 userSchema.pre("save", async function(next) {
   const user = this
   if (user.isModified("password")) {
@@ -36,7 +39,21 @@ userSchema.pre("save", async function(next) {
     user.password = await bcrypt.hash(user.password, 10)
   }
 
+  //attach new stats if non existed
+  //@note this will be call everytime user login (generateAuth) thus regenerating missing stats_doc
+  if (!user.stats || !(await Stats.findById(user.stats))) {
+    const stats = new Stats({})
+    stats.save()
+    user.stats = stats
+  }
+
   //continue
+  next()
+})
+
+userSchema.pre("remove", { query: true, document: true }, async function(next) {
+  const user = this
+  await Stats.findByIdAndDelete(user.stats)
   next()
 })
 
