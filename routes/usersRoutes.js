@@ -13,13 +13,7 @@ const admin = require("../middleware/auth_admin")
 keepKeys = require("../utils/keepKeys")
 discardKeys = require("../utils/discardKeys")
 
-// db = require("../database_connection/mongooseConnection").connection
-// db.once("open", async () => {
-//   const stats = new Stats()
-//   await stats.save()
-// })
-
-/******* User Endpoints  *******/
+/******* Admin Endpoints  *******/
 
 //@desc get all users
 //@auth admin
@@ -60,6 +54,16 @@ router.delete("/users/:id", auth, admin, async (req, resp) => {
     resp.status(404).json({ error: e.message })
   }
 })
+
+//@desc logout and invalidate all bearer token
+//@auth admin
+router.get("/users/logoutall", auth, admin, (req, resp) => {
+  resp.send("Welcome administrator")
+})
+
+/*******************************/
+
+/******* User Endpoints  *******/
 
 //@desc register new user
 //@auth public
@@ -127,14 +131,10 @@ router.get("/users/stats", auth, async (req, resp) => {
 
 //@desc logout and invalidate bearer token
 //@auth user
-router.post("/users/logout", auth, (req, resp) => {})
-
-router.get("/users/logoutall", auth, (req, resp) => {
-  if (req.user.admin) {
-    resp.send("Welcome administrator")
-  } else {
-    resp.json({ error: "insufficient permission" })
-  }
+router.post("/users/logout", auth, (req, resp) => {
+  console.log("Called?")
 })
+
+/*******************************/
 
 module.exports = router

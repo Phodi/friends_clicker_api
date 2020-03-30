@@ -31,7 +31,7 @@ const auth = async (req, res, next) => {
     next()
   } catch (error) {
     console.log("#AUTH authentication failed")
-    res.status(401).json({ error: "not authorize to access this resource." })
+    res.status(401).json({ error: "unauthenticated request" })
   }
 }
 
