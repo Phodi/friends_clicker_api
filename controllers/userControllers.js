@@ -32,7 +32,7 @@ module.exports.getUser = async (req, resp, next) => {
   try {
     const user = await User.findById(req.params.id)
     if (!user) {
-      return new ErrorResponse(`user id ${req.params.id} not found`, 404)
+      throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
     }
     resp.status(200).json({ data: user })
   } catch (error) {
@@ -47,7 +47,7 @@ module.exports.deleteUser = async (req, resp, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id)
     if (!user) {
-      return new ErrorResponse(`user id ${req.params.id} not found`, 404)
+      throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
     }
     const stats = await Stats.findByIdAndDelete(user.stats)
     resp.status(200).json({ msg: `user ${req.params.id} deleted`, data: user })
@@ -102,7 +102,7 @@ module.exports.loginUser = async (req, resp, next) => {
     const user = await User.findByCredentials(email, password)
 
     if (!user) {
-      return new ErrorResponse(`login failed, check your credential`, 404)
+      throw new ErrorResponse(`login failed, check your credential`, 404)
     }
     const token = await user.generateAuthToken()
     resp.status(200).json({ msg: "login successful", data: { token } })
