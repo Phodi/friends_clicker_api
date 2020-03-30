@@ -8,6 +8,7 @@ const app = express()
 //middleware section
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(require("./middleware/error")) //error handler
 
 //routers
 app.use("/api", require("./routes/usersRoutes"))
