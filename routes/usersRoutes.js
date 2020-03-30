@@ -28,7 +28,7 @@ router.get("/users", auth, admin, async (req, resp) => {
 
 //@desc get user by id
 //@auth admin
-router.get("/users/:id", auth, admin, async (req, resp) => {
+router.get("/users/id/:id", auth, admin, async (req, resp) => {
   try {
     const user = await User.findById(req.params.id)
     if (!user) {
@@ -42,7 +42,7 @@ router.get("/users/:id", auth, admin, async (req, resp) => {
 
 //@desc delete user by id
 //@auth admin
-router.delete("/users/:id", auth, admin, async (req, resp) => {
+router.delete("/users/id/:id", auth, admin, async (req, resp) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id)
     if (!user) {
@@ -131,8 +131,8 @@ router.get("/users/stats", auth, async (req, resp) => {
 
 //@desc logout and invalidate bearer token
 //@auth user
-router.post("/users/logout", auth, (req, resp) => {
-  console.log("Called?")
+router.get("/users/logout", auth, (req, resp) => {
+  resp.json({ msg: "okay" })
 })
 
 /*******************************/
