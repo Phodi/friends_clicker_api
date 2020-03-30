@@ -9,7 +9,7 @@ Stats = require("../models/statsModel")
 const auth = require("../middleware/auth")
 const admin = require("../middleware/auth_admin")
 
-//Controller
+//Controllers
 const {
   getAllUsers,
   getUser,

@@ -1,5 +1,17 @@
-module.exports = (error, req, resp, next) => {
-  console.log(error.stack)
+const ErrorResponse = require("../utils/errorResponse")
 
-  resp.status(500).json({ error: error.message })
+module.exports = (err, req, resp, next) => {
+  let error = { ...err }
+  error.message = err.message
+
+  console.log(err.stack)
+
+  if (err.name == "CastError") {
+    const message = `user id ${error.value} is invalid`
+    error = new ErrorResponse(message, 401)
+  }
+
+  resp
+    .status(error.statusCode || 500)
+    .json({ error: error.message || "server error" })
 }
