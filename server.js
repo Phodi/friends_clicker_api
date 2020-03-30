@@ -15,6 +15,15 @@ app.use("/api", require("./routes/scoreboardRoutes"))
 
 const PORT = process.env.PORT
 const HOSTNAME = process.env.HOSTNAME
-app.listen(PORT, HOSTNAME, () => {
+const server = app.listen(PORT, HOSTNAME, () => {
   console.log("Listening on " + HOSTNAME + ":" + PORT)
+})
+
+//handle unhandled promise rejections
+process.on("unhandledRejection", (err, promise) => {
+  console.log(`Error: ${err.message}`)
+  //Close sever and exit
+  server.close(() => {
+    process.exit(1)
+  })
 })
