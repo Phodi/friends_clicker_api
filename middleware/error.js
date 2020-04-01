@@ -7,8 +7,21 @@ module.exports = (err, req, resp, next) => {
   console.log(err.stack.red)
   console.log(err)
 
+  //Mongoose CastError
   if (err.name == "CastError") {
     const message = `user id ${error.value} is invalid`
+    error = new ErrorResponse(message, 401)
+  }
+
+  //Mongoose ValidationError
+  if (err.name == "ValidationError") {
+    const message = Object.values(err.errors).map(e => e.message)
+    error = new ErrorResponse(message, 401)
+  }
+
+  //Mongoose Duplicate Key
+  if (err.code == 11000) {
+    const message = `duplicate field`
     error = new ErrorResponse(message, 401)
   }
 
