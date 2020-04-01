@@ -76,7 +76,6 @@ module.exports.logoutAllUser = (req, resp, next) => {
 //@auth public
 module.exports.registerUser = async (req, resp, next) => {
   try {
-    console.log("Registering new user")
     //new user
     const user = new User(Object.assign({}, req.body, { admin: false }))
 

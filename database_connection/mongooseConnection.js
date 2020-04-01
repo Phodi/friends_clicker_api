@@ -16,9 +16,9 @@ mongoose.connect(connStr, {
   useCreateIndex: true
 })
 const db = mongoose.connection
-db.on("error", () => console.log("Database connection error"))
+db.on("error", () => console.log("Database connection error".red))
 db.once("open", () =>
-  console.log("Database connected: " + mongoose.connection.host)
+  console.log(("Database connected: " + mongoose.connection.host).cyan)
 )
 
 module.exports = mongoose

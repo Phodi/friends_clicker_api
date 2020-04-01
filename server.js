@@ -1,4 +1,5 @@
 require("dotenv-flow").config({ path: "./config/" })
+const colors = require("colors")
 
 const express = require("express")
 const bodyParser = require("body-parser")
@@ -19,7 +20,7 @@ app.use(require("./middleware/error"))
 const PORT = process.env.PORT
 const HOSTNAME = process.env.HOSTNAME
 const server = app.listen(PORT, HOSTNAME, () => {
-  console.log("Listening on " + HOSTNAME + ":" + PORT)
+  console.log(("Listening on " + HOSTNAME + ":" + PORT).cyan)
 })
 
 //handle unhandled promise rejections

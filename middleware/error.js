@@ -4,7 +4,8 @@ module.exports = (err, req, resp, next) => {
   let error = { ...err }
   error.message = err.message
 
-  console.log(err.stack)
+  console.log(err.stack.red)
+  console.log(err)
 
   if (err.name == "CastError") {
     const message = `user id ${error.value} is invalid`
