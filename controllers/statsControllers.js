@@ -25,6 +25,6 @@ module.exports.putStats = asyncHandle(async (req, resp, next) => {
   const stats = await Stats.findByIdAndUpdate(req.user.stats, req.body.data, {
     new: true,
     runValidators: true
-  }).select("-_id -__v")
+  }).select("-_id -__v -user")
   resp.json({ data: stats })
 })
