@@ -34,7 +34,7 @@ module.exports.getUser = asyncHandle(async (req, resp, next) => {
   if (!user) {
     throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
   }
-  resp.status(200).json({ data: user })
+  resp.status(200).json({ user })
 })
 
 //@desc get user by name
@@ -45,7 +45,7 @@ module.exports.getUser_name = asyncHandle(async (req, resp, next) => {
   if (!user) {
     throw new ErrorResponse(`username ${req.params.name} not found`, 404)
   }
-  resp.status(200).json({ data: user })
+  resp.status(200).json({ user })
 })
 
 //@desc delete user by id
@@ -57,7 +57,7 @@ module.exports.deleteUser = asyncHandle(async (req, resp, next) => {
     throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
   }
   const stats = await Stats.findByIdAndDelete(user.stats)
-  resp.status(200).json({ msg: `user ${req.params.id} deleted`, data: user })
+  resp.status(200).json({ msg: `user ${req.params.id} deleted`, user })
 })
 
 //@desc delete user by name
@@ -69,7 +69,7 @@ module.exports.deleteUser_name = asyncHandle(async (req, resp, next) => {
     throw new ErrorResponse(`username ${req.params.name} not found`, 404)
   }
   const stats = await Stats.findByIdAndDelete(user.stats)
-  resp.status(200).json({ msg: `user ${req.params.name} deleted`, data: user })
+  resp.status(200).json({ msg: `user ${req.params.name} deleted`, user })
 })
 
 //@desc logout and invalidate all bearer token
@@ -96,9 +96,19 @@ module.exports.registerUser = asyncHandle(async (req, resp, next) => {
   await user.save()
   const token = await user.generateAuthToken()
 
+  let userInfo = await User.findById(user._id)
+    .select("_id name email admin stats")
+    .populate({
+      path: "stats",
+      select: "-_id -__v -user"
+    })
+
   resp
     .status(201)
-    .json({ msg: "user registration successful", data: { user } })
+    .json({
+      msg: "user registration successful",
+      data: { user: userInfo, token }
+    })
     .end()
 })
 
@@ -113,7 +123,7 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
     throw new ErrorResponse(`login failed, check your credential`, 404)
   }
   const token = await user.generateAuthToken()
-  resp.status(200).json({ msg: "login successful", data: { token } })
+  resp.status(200).json({ msg: "login successful", token })
 })
 
 //@desc get info about logged in user
@@ -126,7 +136,7 @@ module.exports.infoUser = asyncHandle(async (req, resp, next) => {
       path: "stats",
       select: "-_id -__v -user"
     })
-  resp.json(userInfo)
+  resp.json({ user: userInfo })
 })
 
 //@desc logout and invalidate bearer token
@@ -134,7 +144,7 @@ module.exports.infoUser = asyncHandle(async (req, resp, next) => {
 //@auth user
 module.exports.logoutUser = asyncHandle(async (req, resp, next) => {
   const result = await req.user.logout(req.token)
-  resp.json({ msg: "logout successful" })
+  resp.json({ token: req.token })
 })
 
 //@desc logout and invalidate all user's bearer tokens
