@@ -7,19 +7,27 @@ const validator = require("validator")
 Stats = require("../models/statsModel")
 
 const userSchema = new connection.Schema({
-  name: { type: String, required: true, trim: true },
+  name: {
+    type: String,
+    required: [true, "name required"],
+    maxlength: [30, "name cannot be longer than 30 characters"],
+    trim: true
+  },
   email: {
     type: String,
-    required: true,
+    required: [true, "email address required"],
     unique: true,
     lowercase: true,
-    validator: value => {
-      if (!validator.isEmail(value)) {
-        throw new Error({ error: "Invalid email address!" })
-      }
+    validate: {
+      validator: value => validator.isEmail(value),
+      message: "email address invalid"
     }
   },
-  password: { type: String, required: true, minlength: 6 }, //hashed password
+  password: {
+    type: String,
+    required: [true, "password required"],
+    minlength: 6
+  }, //hashed password
   admin: { type: Boolean, required: true, default: false },
   tokens: [
     {
@@ -88,6 +96,31 @@ userSchema.statics.findByCredentials = async (email, password) => {
     return user
   } catch (error) {
     return null
+  }
+}
+
+userSchema.methods.logout = async function(token) {
+  try {
+    const user = this
+    const remainingTokens = user.tokens.filter(obj => obj.token != token)
+    user.tokens = remainingTokens
+    await user.save()
+    return true
+  } catch (error) {
+    console.log(error)
+    return false
+  }
+}
+
+userSchema.methods.logoutAll = async function() {
+  try {
+    const user = this
+    user.tokens = []
+    await user.save()
+    return true
+  } catch (error) {
+    console.log(error)
+    return false
   }
 }
 

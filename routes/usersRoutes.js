@@ -17,6 +17,7 @@ const {
   deleteUser,
   loginUser,
   logoutUser,
+  logoutUserAll,
   logoutAllUser,
   infoUser,
   statsUser
@@ -48,21 +49,25 @@ router.get("/users/logoutall", auth, admin, logoutAllUser)
 //@auth public
 router.post("/users", registerUser)
 
-//@desc login and generate bearer token
-//@auth user
-router.post("/users/login", loginUser)
-
 //@desc get info about logged in user
 //auth user
 router.get("/users/me", auth, infoUser)
 
 //@desc get logged in user's stats
 //auth user
-router.get("/users/stats", auth, statsUser)
+router.get("/users/me/stats", auth, statsUser)
+
+//@desc login and generate bearer token
+//@auth user
+router.post("/users/me/login", loginUser)
 
 //@desc logout and invalidate bearer token
 //@auth user
-router.get("/users/logout", auth, logoutUser)
+router.get("/users/me/logout", auth, logoutUser)
+
+//@desc logout and invalidate all user's bearer tokens
+//@auth user
+router.get("/users/me/logoutall", auth, logoutUserAll)
 
 /*******************************/
 

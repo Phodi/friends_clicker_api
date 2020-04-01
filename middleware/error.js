@@ -4,7 +4,6 @@ module.exports = (err, req, resp, next) => {
   let error = { ...err }
   error.message = err.message
 
-  console.log(err.stack.red)
   console.log(err)
 
   //Mongoose CastError

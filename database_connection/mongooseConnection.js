@@ -6,7 +6,7 @@ const connStr = process.env.DATABASE_URL.replace(
 )
   .replace("<password>", process.env.DATABASE_PWD)
   .replace("<database>", process.env.DATABASE_NAME)
-console.log("Connecting to: " + connStr)
+console.log(("Connecting to: " + connStr).cyan)
 
 const mongoose = require("mongoose")
 mongoose.connect(connStr, {
