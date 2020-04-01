@@ -37,6 +37,17 @@ module.exports.getUser = asyncHandle(async (req, resp, next) => {
   resp.status(200).json({ data: user })
 })
 
+//@desc get user by name
+//@route GET /users/name/:name
+//@auth admin
+module.exports.getUser_name = asyncHandle(async (req, resp, next) => {
+  const user = await User.findOne({ name: req.params.name })
+  if (!user) {
+    throw new ErrorResponse(`username ${req.params.name} not found`, 404)
+  }
+  resp.status(200).json({ data: user })
+})
+
 //@desc delete user by id
 //@route DELETE /users/id/:id
 //@auth admin
@@ -47,6 +58,18 @@ module.exports.deleteUser = asyncHandle(async (req, resp, next) => {
   }
   const stats = await Stats.findByIdAndDelete(user.stats)
   resp.status(200).json({ msg: `user ${req.params.id} deleted`, data: user })
+})
+
+//@desc delete user by name
+//@route DELETE /users/name/:name
+//@auth admin
+module.exports.deleteUser_name = asyncHandle(async (req, resp, next) => {
+  const user = await User.findOneAndDelete({ name: req.params.name })
+  if (!user) {
+    throw new ErrorResponse(`username ${req.params.name} not found`, 404)
+  }
+  const stats = await Stats.findByIdAndDelete(user.stats)
+  resp.status(200).json({ msg: `user ${req.params.name} deleted`, data: user })
 })
 
 //@desc logout and invalidate all bearer token

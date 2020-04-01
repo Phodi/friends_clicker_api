@@ -13,8 +13,10 @@ const admin = require("../middleware/auth_admin")
 const {
   getAllUsers,
   getUser,
+  getUser_name,
   registerUser,
   deleteUser,
+  deleteUser_name,
   loginUser,
   logoutUser,
   logoutUserAll,
@@ -33,7 +35,15 @@ router.get("/users", auth, admin, getAllUsers)
 //@auth admin
 router.get("/users/id/:id", auth, admin, getUser)
 
+//@desc get user by name
+//@auth admin
+router.get("/users/name/:name", auth, admin, getUser_name)
+
 //@desc delete user by id
+//@auth admin
+router.delete("/users/name/:name", auth, admin, deleteUser_name)
+
+//@desc delete user by name
 //@auth admin
 router.delete("/users/id/:id", auth, admin, deleteUser)
 
