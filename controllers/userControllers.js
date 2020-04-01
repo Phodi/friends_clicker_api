@@ -18,8 +18,14 @@ module.exports = {}
 //@route GET /users
 //@auth admin
 module.exports.getAllUsers = asyncHandle(async (req, resp, next) => {
-  const users = await User.find()
-  resp.status(200).json({ data: users })
+  //parse query
+  let query = req.query
+  query = JSON.stringify(query)
+  query.replace(/\b(gt|gte|le|let|in)\b/g, match => `$${match}`)
+  query = JSON.parse(query)
+
+  const users = await User.find(query)
+  resp.status(200).json({ data: { count: users.length, users } })
 })
 
 //@desc get user by id

@@ -11,12 +11,18 @@ const userSchema = new connection.Schema({
     type: String,
     required: [true, "name required"],
     maxlength: [30, "name cannot be longer than 30 characters"],
-    trim: true
+    unique: [true, "this name is already taken"],
+    validate: [
+      {
+        validator: value => !value.includes(" "),
+        msg: "name cannot have spaces"
+      }
+    ]
   },
   email: {
     type: String,
     required: [true, "email address required"],
-    unique: true,
+    unique: [true, "this email address is already used"],
     lowercase: true,
     validate: {
       validator: value => validator.isEmail(value),
@@ -50,6 +56,7 @@ userSchema.pre("save", async function(next) {
   //attach new stats if non existed
   //@note this will be call everytime user login (generateAuth) thus regenerating missing stats_doc
   if (!user.stats || !(await Stats.findById(user.stats))) {
+    console.log(`creating new stats for [${user.name}]`.yellow)
     const stats = new Stats({})
     stats.save()
     user.stats = stats
