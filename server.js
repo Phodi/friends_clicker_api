@@ -1,22 +1,8 @@
 require("dotenv-flow").config({ path: "./config/" })
 const colors = require("colors")
 
-const express = require("express")
-const bodyParser = require("body-parser")
-
-const app = express()
-
-//middleware section
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-
-//routers
-app.use("/api", require("./routes/usersRoutes"))
-app.use("/api", require("./routes/scoreboardRoutes"))
-app.use("/api", require("./routes/statsRoutes"))
-
-//error handler
-app.use(require("./middleware/error"))
+//Main app
+const app = require("./app")
 
 const PORT = process.env.PORT
 const HOSTNAME = process.env.HOSTNAME
