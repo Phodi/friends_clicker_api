@@ -128,7 +128,7 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
 
 //@desc get info about logged in user
 //@route GET /users/me
-//auth user
+//@auth user
 module.exports.infoUser = asyncHandle(async (req, resp, next) => {
   let userInfo = await User.findById(req.user._id)
     .select("_id name email admin stats")
