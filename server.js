@@ -1,5 +1,4 @@
 require("dotenv-flow").config({ path: "./config/" })
-const colors = require("colors")
 
 //Main app
 const app = require("./app")
