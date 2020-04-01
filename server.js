@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 //routers
 app.use("/api", require("./routes/usersRoutes"))
 app.use("/api", require("./routes/scoreboardRoutes"))
+app.use("/api", require("./routes/statsRoutes"))
 
 //error handler
 app.use(require("./middleware/error"))

@@ -8,6 +8,9 @@ Stats = require("../models/statsModel")
 
 module.exports = {}
 
+//@desc get highest scores
+//@route GET /scoreboard
+//@auth public
 module.exports.getScoreboard = asyncHandle(async (req, resp, next) => {
   let scores = await Stats.find()
     .select("-_id -__v")

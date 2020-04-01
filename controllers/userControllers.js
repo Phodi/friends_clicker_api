@@ -131,14 +131,6 @@ module.exports.infoUser = asyncHandle(async (req, resp, next) => {
   resp.json(userInfo)
 })
 
-//@desc get logged in user's stats
-//@route GET /users/me/stats
-//@auth user
-module.exports.statsUser = asyncHandle(async (req, resp, next) => {
-  const stats = await Stats.findById(req.user.stats).select("-_id -__v -user")
-  resp.json({ data: stats })
-})
-
 //@desc logout and invalidate bearer token
 //@route GET /users/logout
 //@auth user

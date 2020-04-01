@@ -21,8 +21,7 @@ const {
   logoutUser,
   logoutUserAll,
   logoutAllUser,
-  infoUser,
-  statsUser
+  infoUser
 } = require("../controllers/userControllers")
 
 /******* Admin Endpoints  *******/
@@ -62,10 +61,6 @@ router.post("/users", registerUser)
 //@desc get info about logged in user
 //auth user
 router.get("/users/me", auth, infoUser)
-
-//@desc get logged in user's stats
-//auth user
-router.get("/users/me/stats", auth, statsUser)
 
 //@desc login and generate bearer token
 //@auth user
