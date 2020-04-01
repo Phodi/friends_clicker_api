@@ -12,7 +12,7 @@ module.exports = {}
 //@route GET /scoreboard
 //@auth public
 module.exports.getScoreboard = asyncHandle(async (req, resp, next) => {
-  let scores = await Stats.find()
+  const scores = await Stats.find()
     .select("-_id -__v")
     .populate({
       path: "user",

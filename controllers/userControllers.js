@@ -120,14 +120,12 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
 //@route GET /users/me
 //auth user
 module.exports.infoUser = asyncHandle(async (req, resp, next) => {
-  const stats = await Stats.findById(req.user.stats).select("-_id -__v -user")
-
-  const userInfo = {
-    name: req.user.name,
-    email: req.user.email,
-    admin: req.user.admin,
-    stats: stats
-  }
+  let userInfo = await await User.findById(req.user._id)
+    .select("_id name email admin stats")
+    .populate({
+      path: "stats",
+      select: "-_id -__v -user"
+    })
   resp.json(userInfo)
 })
 
