@@ -16,7 +16,7 @@ module.exports.getScoreboard = asyncHandle(async (req, resp, next) => {
     .select("-_id -__v")
     .populate({
       path: "user",
-      select: "name admin"
+      select: "name admin -_id"
     })
     .sort("-currentScore")
 
