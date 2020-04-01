@@ -5,8 +5,6 @@ const User = require("../models/userModel")
 const Stats = require("../models/statsModel")
 
 //Utilities
-const keepKeys = require("../utils/keepKeys")
-const discardKeys = require("../utils/discardKeys")
 const ErrorResponse = require("../utils/errorResponse")
 const asyncHandle = require("../middleware/asyncHandler")
 
@@ -99,12 +97,13 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
 //@route GET /users/me
 //auth user
 module.exports.infoUser = asyncHandle(async (req, resp, next) => {
-  const stats = { ...(await Stats.findById(req.user.stats)) }
+  const stats = await Stats.findById(req.user.stats).select("-_id -__v -user")
+
   const userInfo = {
     name: req.user.name,
     email: req.user.email,
     admin: req.user.admin,
-    stats: discardKeys(stats._doc, ["_id", "__v"])
+    stats: stats
   }
   resp.json(userInfo)
 })
@@ -113,8 +112,8 @@ module.exports.infoUser = asyncHandle(async (req, resp, next) => {
 //@route GET /users/me/stats
 //@auth user
 module.exports.statsUser = asyncHandle(async (req, resp, next) => {
-  const stats = await Stats.findById(req.user.stats)
-  resp.json(discardKeys(stats._doc, ["_id", "__v"]))
+  const stats = await Stats.findById(req.user.stats).select("-_id -__v -user")
+  resp.json({ data: stats })
 })
 
 //@desc logout and invalidate bearer token

@@ -40,7 +40,7 @@ const userSchema = new connection.Schema({
       token: { type: String, required: true }
     }
   ],
-  stats: { type: connection.Schema.Types.ObjectId },
+  stats: { type: connection.Schema.Types.ObjectId, ref: "Stats" },
   created: { type: Date, required: true, default: Date.now },
   updated: { type: Date, required: true, default: Date.now }
 })
@@ -57,7 +57,7 @@ userSchema.pre("save", async function(next) {
   //@note this will be call everytime user login (generateAuth) thus regenerating missing stats_doc
   if (!user.stats || !(await Stats.findById(user.stats))) {
     console.log(`creating new stats for [${user.name}]`.yellow)
-    const stats = new Stats({})
+    const stats = new Stats({ user: user._id })
     stats.save()
     user.stats = stats
   }
