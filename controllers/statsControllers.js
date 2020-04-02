@@ -7,12 +7,22 @@ User = require("../models/userModel")
 Stats = require("../models/statsModel")
 
 module.exports = {}
+// const test = async () => {
+//   console.log("I'm here")
+//   try {
+//     await new Stats().save()
+//   } catch (err) {
+//     console.log(err.message.red)
+//   }
+// }
+// test()
 
 //@desc get logged in user's stats
 //@route GET /stats
 //@auth user
 module.exports.getStats = asyncHandle(async (req, resp, next) => {
-  const stats = await Stats.findById(req.user.stats).select("-_id -__v -user")
+  await (await Stats.findById(req.user.stats)).calculate() //update current user stats
+  const stats = await Stats.findById(req.user.stats).select("-__v -user")
   resp.json({ data: stats })
 })
 
@@ -21,10 +31,14 @@ module.exports.getStats = asyncHandle(async (req, resp, next) => {
 //@auth user
 //@note use data inside requestBody.data to update stats
 module.exports.putStats = asyncHandle(async (req, resp, next) => {
-  // console.log("req.body.data :", req.body.data)
-  const stats = await Stats.findByIdAndUpdate(req.user.stats, req.body.data, {
-    new: true,
-    runValidators: true
-  }).select("-_id -__v -user")
+  await (await Stats.findById(req.user.stats)).calculate() //update current user stats
+  const stats = await Stats.findByIdAndUpdate(
+    req.user.stats,
+    Object.assign(req.body.data, { updated: Date.now() }),
+    {
+      new: true,
+      runValidators: true
+    }
+  ).select("-__v -user")
   resp.json({ data: stats })
 })

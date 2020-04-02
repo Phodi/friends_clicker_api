@@ -22,6 +22,7 @@ module.exports.getAllUsers = asyncHandle(async (req, resp, next) => {
   query.replace(/\b(gt|gte|le|let|in)\b/g, match => `$${match}`)
   query = JSON.parse(query)
 
+  await Stats.calculateAll() //update all users
   const users = await User.find(query)
   resp.status(200).json({ data: { count: users.length, users } })
 })
@@ -31,6 +32,7 @@ module.exports.getAllUsers = asyncHandle(async (req, resp, next) => {
 //@auth admin
 module.exports.getUser = asyncHandle(async (req, resp, next) => {
   const user = await User.findById(req.params.id)
+  await (await Stats.findById(user.stats)).calculate() //update current user stats
   if (!user) {
     throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
   }
@@ -42,6 +44,7 @@ module.exports.getUser = asyncHandle(async (req, resp, next) => {
 //@auth admin
 module.exports.getUser_name = asyncHandle(async (req, resp, next) => {
   const user = await User.findOne({ name: req.params.name })
+  await (await Stats.findById(user.stats)).calculate() //update current user stats
   if (!user) {
     throw new ErrorResponse(`username ${req.params.name} not found`, 404)
   }
@@ -53,6 +56,7 @@ module.exports.getUser_name = asyncHandle(async (req, resp, next) => {
 //@auth admin
 module.exports.deleteUser = asyncHandle(async (req, resp, next) => {
   const user = await User.findByIdAndDelete(req.params.id)
+  await (await Stats.findById(user.stats)).calculate() //update current user stats
   if (!user) {
     throw new ErrorResponse(`user id ${req.params.id} not found`, 404)
   }
@@ -130,6 +134,7 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
 //@route GET /users/me
 //@auth user
 module.exports.infoUser = asyncHandle(async (req, resp, next) => {
+  await (await Stats.findById(req.user.stats)).calculate() //update current user stats
   let userInfo = await User.findById(req.user._id)
     .select("_id name email admin stats")
     .populate({

@@ -12,6 +12,7 @@ module.exports = {}
 //@route GET /scoreboard
 //@auth public
 module.exports.getScoreboard = asyncHandle(async (req, resp, next) => {
+  await Stats.calculateAll()
   const scores = await Stats.find()
     .select("-_id -__v")
     .populate({
