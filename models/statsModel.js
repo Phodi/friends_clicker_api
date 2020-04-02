@@ -10,9 +10,15 @@ const statsSchema = new connection.Schema({
 
 statsSchema.methods.calculate = async function() {
   const stats = this
+
   const secondsPassed = (Date.now() - stats.updated) / 1000
-  const additionScore = stats.autoRate * secondsPassed
+
+  //Additional score
+  let additionScore = stats.autoRate * secondsPassed
+
+  //Apply score
   stats.currentScore += additionScore
+
   stats.updated = Date.now()
   await stats.save()
   return stats
