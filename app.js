@@ -1,8 +1,12 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const colors = require("colors")
+const cors = require("cors")
 
 const app = express()
+
+//CORS
+app.use(cors())
 
 //middleware section
 app.use(bodyParser.json())
