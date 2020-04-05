@@ -17,6 +17,9 @@ app.use("/api", require("./routes/usersRoutes"))
 app.use("/api", require("./routes/scoreboardRoutes"))
 app.use("/api", require("./routes/statsRoutes"))
 
+//react_build (Website)
+app.use("/", express.static("./react_build"))
+
 //error handler
 app.use(require("./middleware/error"))
 
