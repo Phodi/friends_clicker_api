@@ -33,6 +33,18 @@ const auth = asyncHandle(async (req, res, next) => {
     console.log("#AUTH authentication failed")
     if (error.name == "TokenExpiredError") {
       console.log("#AUTH authentication failed token expired")
+
+      //Find and delete expired token
+      const token = req.header("Authorization").replace("Bearer ", "")
+      const payload = jwt.decode(token)
+      const user = await User.findOne({
+        _id: payload._id,
+        "tokens.token": token,
+      })
+      if (user) {
+        user.logout(token)
+      }
+
       throw new ErrorResponse("token expired", 401)
     }
     console.log("#AUTH error: ", error)
