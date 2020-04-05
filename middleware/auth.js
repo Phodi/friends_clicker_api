@@ -1,8 +1,12 @@
 const jwt = require("jsonwebtoken")
 const User = require("../models/userModel")
 
+//Utilities
+const ErrorResponse = require("../utils/errorResponse")
+const asyncHandle = require("../middleware/asyncHandler")
+
 //middleware for user authentication
-const auth = async (req, res, next) => {
+const auth = asyncHandle(async (req, res, next) => {
   try {
     // 'Bearer <token bla bla bla> => '<token bla bla bla>'
     const token = req.header("Authorization").replace("Bearer ", "")
@@ -11,7 +15,7 @@ const auth = async (req, res, next) => {
     //user exist in the systyem?
     const user = await User.findOne({ _id: payload._id, "tokens.token": token })
     if (!user) {
-      throw new Error()
+      throw new ErrorResponse("user does not exist", 404)
     }
 
     //attach user object to the request
@@ -19,20 +23,21 @@ const auth = async (req, res, next) => {
     req.token = token
 
     console.log(
-      "#AUTH " +
-        (user.admin ? "Admin" : "User") +
-        "[ " +
-        user.name +
-        " : " +
-        user.email +
-        " ] authenticated"
+      `#AUTH ${user.admin ? "Admin" : "User"}[ ${user.name} : ${
+        user.email
+      }] authenticated`
     )
 
     next()
   } catch (error) {
     console.log("#AUTH authentication failed")
-    res.status(401).json({ error: "unauthenticated request" })
+    if (error.name == "TokenExpiredError") {
+      console.log("#AUTH authentication failed token expired")
+      throw new ErrorResponse("token expired", 401)
+    }
+    console.log("#AUTH error: ", error)
+    throw new ErrorResponse("unauthenticated request", 401)
   }
-}
+})
 
 module.exports = auth
