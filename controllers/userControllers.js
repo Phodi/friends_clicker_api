@@ -19,7 +19,7 @@ module.exports.getAllUsers = asyncHandle(async (req, resp, next) => {
   //parse query
   let query = req.query
   query = JSON.stringify(query)
-  query.replace(/\b(gt|gte|le|let|in)\b/g, match => `$${match}`)
+  query.replace(/\b(gt|gte|le|let|in)\b/g, (match) => `$${match}`)
   query = JSON.parse(query)
 
   await Stats.calculateAll() //update all users
@@ -81,7 +81,7 @@ module.exports.deleteUser_name = asyncHandle(async (req, resp, next) => {
 //@auth admin
 module.exports.logoutAllUser = asyncHandle(async (req, resp, next) => {
   const cursor = User.find().cursor()
-  await cursor.eachAsync(async user => await user.logoutAll())
+  await cursor.eachAsync(async (user) => await user.logoutAll())
   resp.status(200).json({ msg: "logout all users successful" })
 })
 
@@ -104,14 +104,14 @@ module.exports.registerUser = asyncHandle(async (req, resp, next) => {
     .select("_id name email admin stats")
     .populate({
       path: "stats",
-      select: "-_id -__v -user"
+      select: "-_id -__v -user",
     })
 
   resp
     .status(201)
     .json({
       msg: "user registration successful",
-      data: { user: userInfo, token }
+      data: { user: userInfo, token },
     })
     .end()
 })
@@ -139,17 +139,27 @@ module.exports.infoUser = asyncHandle(async (req, resp, next) => {
     .select("_id name email admin stats")
     .populate({
       path: "stats",
-      select: "-_id -__v -user"
+      select: "-_id -__v -user",
     })
   resp.json({ user: userInfo })
 })
 
 //@desc logout and invalidate bearer token
-//@route GET /users/logout
+//@route GET /users/me/logout
 //@auth user
 module.exports.logoutUser = asyncHandle(async (req, resp, next) => {
   const result = await req.user.logout(req.token)
   resp.json({ token: req.token })
+})
+
+//@desc invalidate old token and generate a new one to extend login time
+//@route GET /users/me/renew
+//@auth user
+module.exports.renewUser = asyncHandle(async (req, resp, next) => {
+  await req.user.logout(req.token)
+  const newToken = await req.user.generateAuthToken()
+
+  resp.json({ token: newToken })
 })
 
 //@desc logout and invalidate all user's bearer tokens

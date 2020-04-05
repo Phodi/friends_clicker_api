@@ -19,9 +19,10 @@ const {
   deleteUser_name,
   loginUser,
   logoutUser,
+  renewUser,
   logoutUserAll,
   logoutAllUser,
-  infoUser
+  infoUser,
 } = require("../controllers/userControllers")
 
 /******* Admin Endpoints  *******/
@@ -69,6 +70,11 @@ router.post("/users/me/login", loginUser)
 //@desc logout and invalidate bearer token
 //@auth user
 router.get("/users/me/logout", auth, logoutUser)
+
+//@desc invalidate old token and generate a new one to extend login time
+//@route GET /users/me/renew
+//@auth user
+router.get("/users/me/renew", auth, renewUser)
 
 //@desc logout and invalidate all user's bearer tokens
 //@auth user
