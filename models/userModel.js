@@ -14,10 +14,10 @@ const userSchema = new connection.Schema({
     unique: [true, "this name is already taken"],
     validate: [
       {
-        validator: value => !value.includes(" "),
-        msg: "name cannot have spaces"
-      }
-    ]
+        validator: (value) => !value.includes(" "),
+        msg: "name cannot have spaces",
+      },
+    ],
   },
   email: {
     type: String,
@@ -25,28 +25,28 @@ const userSchema = new connection.Schema({
     unique: [true, "this email address is already used"],
     lowercase: true,
     validate: {
-      validator: value => validator.isEmail(value),
-      message: "email address invalid"
-    }
+      validator: (value) => validator.isEmail(value),
+      message: "email address invalid",
+    },
   },
   password: {
     type: String,
     required: [true, "password required"],
-    minlength: 6
+    minlength: 6,
   }, //hashed password
   admin: { type: Boolean, required: true, default: false },
   tokens: [
     {
-      token: { type: String, required: true }
-    }
+      token: { type: String, required: true },
+    },
   ],
   stats: { type: connection.Schema.Types.ObjectId, ref: "Stats" },
   created: { type: Date, required: true, default: Date.now },
-  updated: { type: Date, required: true, default: Date.now }
+  updated: { type: Date, required: true, default: Date.now },
 })
 
 // schema-level middleware
-userSchema.pre("save", async function(next) {
+userSchema.pre("save", async function (next) {
   const user = this
   if (user.isModified("password")) {
     //salt+hash encrption (มีสอบด้วย!!!)
@@ -66,23 +66,25 @@ userSchema.pre("save", async function(next) {
   next()
 })
 
-userSchema.pre("remove", { query: true, document: true }, async function(next) {
+userSchema.pre("remove", { query: true, document: true }, async function (
+  next
+) {
   const user = this
   await Stats.findByIdAndDelete(user.stats)
   next()
 })
 
-userSchema.methods.generateAuthToken = async function() {
+userSchema.methods.generateAuthToken = async function () {
   const user = this
   const payload = {
     _id: user._id,
     email: user.email,
-    admin: user.admin
+    admin: user.admin,
   }
 
   const token = jwt.sign(payload, process.env.TOKEN_KEY, {
-    expiresIn: "2h",
-    issuer: "ClickerAuthority"
+    expiresIn: "2m",
+    issuer: "ClickerAuthority",
   })
   user.tokens = user.tokens.concat({ token: token })
   await user.save()
@@ -106,10 +108,10 @@ userSchema.statics.findByCredentials = async (email, password) => {
   }
 }
 
-userSchema.methods.logout = async function(token) {
+userSchema.methods.logout = async function (token) {
   try {
     const user = this
-    const remainingTokens = user.tokens.filter(obj => obj.token != token)
+    const remainingTokens = user.tokens.filter((obj) => obj.token != token)
     user.tokens = remainingTokens
     await user.save()
     return true
@@ -119,7 +121,7 @@ userSchema.methods.logout = async function(token) {
   }
 }
 
-userSchema.methods.logoutAll = async function() {
+userSchema.methods.logoutAll = async function () {
   try {
     const user = this
     user.tokens = []
