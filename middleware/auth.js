@@ -4,6 +4,7 @@ const User = require("../models/userModel")
 //Utilities
 const ErrorResponse = require("../utils/errorResponse")
 const asyncHandle = require("../middleware/asyncHandler")
+const repairStats = require("../utils/repairStats")
 
 //middleware for user authentication
 const auth = asyncHandle(async (req, res, next) => {
@@ -21,6 +22,9 @@ const auth = asyncHandle(async (req, res, next) => {
     //attach user object to the request
     req.user = user
     req.token = token
+
+    //run statsRepair
+    await repairStats(user)
 
     console.log(
       `#AUTH ${user.admin ? "Admin" : "User"}[ ${user.name} : ${

@@ -52,19 +52,22 @@ userSchema.pre("save", async function (next) {
     //salt+hash encrption (มีสอบด้วย!!!)
     user.password = await bcrypt.hash(user.password, 10)
   }
-
-  //attach new stats if non existed
-  //@note this will be call everytime user login (generateAuth) thus regenerating missing stats_doc
-  if (!user.stats || !(await Stats.findById(user.stats))) {
-    console.log(`creating new stats for [${user.name}]`.yellow)
-    const stats = new Stats({ user: user._id })
-    stats.save()
-    user.stats = stats
-  }
-
   //continue
   next()
 })
+
+// BUG: always create new stat even if user info validation failed
+// userSchema.post("validate", async function () {
+//   const user = this
+//   //attach new stats if non existed
+//   //@note this will be call everytime user login (generateAuth) thus regenerating missing stats_doc
+//   if (!user.stats || !(await Stats.findById(user.stats))) {
+//     console.log(`creating new stats for [${user.name}]`.yellow)
+//     const stats = new Stats({ user: user._id })
+//     stats.save()
+//     user.stats = stats
+//   }
+// })
 
 userSchema.pre("remove", { query: true, document: true }, async function (
   next
