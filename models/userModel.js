@@ -86,7 +86,7 @@ userSchema.methods.generateAuthToken = async function () {
   }
 
   const token = jwt.sign(payload, process.env.TOKEN_KEY, {
-    expiresIn: "2m",
+    expiresIn: "30d",
     issuer: "ClickerAuthority",
   })
   user.tokens = user.tokens.concat({ token: token })

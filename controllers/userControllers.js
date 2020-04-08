@@ -8,6 +8,7 @@ const Stats = require("../models/statsModel")
 const ErrorResponse = require("../utils/errorResponse")
 const asyncHandle = require("../middleware/asyncHandler")
 const bcrypt = require("bcryptjs")
+const attachToken = require("../utils/attachTokenCookie.js")
 
 module.exports = {}
 
@@ -108,13 +109,19 @@ module.exports.registerUser = asyncHandle(async (req, resp, next) => {
       select: "-_id -__v -user",
     })
 
-  resp
-    .status(201)
-    .json({
-      msg: "user registration successful",
-      data: { user: userInfo, token },
-    })
-    .end()
+  attachToken(
+    { msg: "user registration successful", user: userInfo },
+    token,
+    201,
+    resp
+  )
+  // resp
+  //   .status(201)
+  //   .json({
+  //     msg: "user registration successful",
+  //     data: { user: userInfo, token },
+  //   })
+  //   .end()
 })
 
 //@desc register new user
@@ -148,7 +155,10 @@ module.exports.loginUser = asyncHandle(async (req, resp, next) => {
     throw new ErrorResponse(`login failed, check your credential`, 404)
   }
   const token = await user.generateAuthToken()
-  resp.status(200).json({ msg: "login successful", token })
+
+  attachToken({ msg: "login successful" }, token, 200, resp)
+
+  // resp.status(200).json({ msg: "login successful", token })
 })
 
 //@desc get info about logged in user
@@ -180,7 +190,7 @@ module.exports.renewUser = asyncHandle(async (req, resp, next) => {
   await req.user.logout(req.token)
   const newToken = await req.user.generateAuthToken()
 
-  resp.json({ token: newToken })
+  attachToken({}, newToken, 200, resp)
 })
 
 //@desc logout and invalidate all user's bearer tokens

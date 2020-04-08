@@ -3,6 +3,7 @@ const path = require("path")
 const bodyParser = require("body-parser")
 const colors = require("colors")
 const cors = require("cors")
+const cookieParser = require("cookie-parser")
 
 const app = express()
 
@@ -12,6 +13,7 @@ app.use(cors())
 //middleware section
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
+app.use(cookieParser())
 
 //routers
 app.use("/api", require("./routes/usersRoutes"))
