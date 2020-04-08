@@ -15,6 +15,7 @@ const {
   getUser,
   getUser_name,
   registerUser,
+  updateUser,
   deleteUser,
   deleteUser_name,
   loginUser,
@@ -58,6 +59,10 @@ router.get("/users/logoutall", auth, admin, logoutAllUser)
 //@desc register new user
 //@auth public
 router.post("/users", registerUser)
+
+//@desc update user info
+//@auth user
+router.put("/users/me", auth, updateUser)
 
 //@desc get info about logged in user
 //auth user

@@ -7,6 +7,7 @@ const Stats = require("../models/statsModel")
 //Utilities
 const ErrorResponse = require("../utils/errorResponse")
 const asyncHandle = require("../middleware/asyncHandler")
+const bcrypt = require("bcryptjs")
 
 module.exports = {}
 
@@ -112,6 +113,26 @@ module.exports.registerUser = asyncHandle(async (req, resp, next) => {
     .json({
       msg: "user registration successful",
       data: { user: userInfo, token },
+    })
+    .end()
+})
+
+//@desc register new user
+//@route POST /users/me
+//@auth user
+module.exports.updateUser = asyncHandle(async (req, resp, next) => {
+  if (req.body.password)
+    req.body.password = await bcrypt.hash(req.body.password, 10)
+  let userInfo = await User.findByIdAndUpdate(req.user._id, req.body, {
+    new: true,
+    runValidators: true,
+  })
+
+  resp
+    .status(201)
+    .json({
+      msg: "user update successful",
+      data: { user: userInfo },
     })
     .end()
 })
